@@ -1,5 +1,6 @@
 import math
 import random
+from turtle import width
 import pygame
 
 import time
@@ -106,6 +107,24 @@ class Ball:
 
         # paddle detection
         if self.y > SCREEN_HEIGHT - paddle.width:
+            ballpos = self.x+self.size/2
+            padpos = paddle.x + paddle.length/2
+            vector_size = (self.velocity[0]**2+self.velocity[1]**2)**(1/2)
+            if abs(padpos-ballpos) < paddle.length/6:
+                print("a")
+                self.velocity[1] = vector_size * math.sin(math.pi/2)
+                self.velocity[0] = vector_size * math.cos(math.pi/2)
+                
+            elif abs(padpos-ballpos) < paddle.length*2/6:
+                print("b")
+                self.velocity[1] = vector_size * math.sin(math.pi/4)
+                self.velocity[0] = vector_size * math.cos(math.pi/4)
+            else:
+                print("c")
+                self.velocity[1] = vector_size * math.sin(math.pi/6)
+                self.velocity[0] = vector_size * math.cos(math.pi/6)
+            if padpos-ballpos > 0:
+                self.velocity[0]*=-1
             if self.x+self.size/2 > paddle.x and self.x+self.size/2 < paddle.x + paddle.length:
                 self.vflip()
         if self.y > SCREEN_HEIGHT:
@@ -218,7 +237,7 @@ def render(msg=None):
                          ((SCREEN_LENGTH/2) + math.cos(LAUNCH_ANGLE) * 60, -60*math.sin(LAUNCH_ANGLE) + SCREEN_HEIGHT), 4)
 
 
-LAUNCH_ANGLE = 90
+LAUNCH_ANGLE = math.pi/2
 ALEFT, ARIGHT = False, False
 game_start = False
 
@@ -301,13 +320,17 @@ while running:
                     ARIGHT = False
                 if event.key == pygame.K_SPACE:
                     game_start = True
-                    balls.append(Ball(240, 711, velocity=[math.cos(
+                    balls.append(Ball(240, 701, velocity=[math.cos(
                         LAUNCH_ANGLE)*4.25, -4.25*math.sin(LAUNCH_ANGLE)]))
 
     if ALEFT:
         LAUNCH_ANGLE += 0.01
     if ARIGHT:
         LAUNCH_ANGLE -= 0.01
+    if LAUNCH_ANGLE < math.pi*.10:
+        LAUNCH_ANGLE = math.pi*.10
+    if LAUNCH_ANGLE > math.pi*.90:
+        LAUNCH_ANGLE = math.pi*.9
 
     if len(bricks) == 0 and game_start:
         print("Level Cleared")
